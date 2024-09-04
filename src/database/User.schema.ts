@@ -78,5 +78,4 @@ UserSchema.pre<UserDocument>('save', async function (next) {
   next();
 });
 
-// Add the paginate plugin
 UserSchema.plugin(mongoosePaginate);

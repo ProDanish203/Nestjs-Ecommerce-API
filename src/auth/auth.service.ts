@@ -1,9 +1,14 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { RegisterDto, LoginDto } from './dto/auth.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from 'src/database/User.schema';
 import { Model } from 'mongoose';
-import { Response, response } from 'express';
+import { Response, Request } from 'express';
 
 @Injectable()
 export class AuthService {
@@ -69,7 +74,7 @@ export class AuthService {
         httpOnly: true,
         secure: true,
       };
-      response.cookie('accessToken', accessToken, cookieOptions);
+      response.cookie('token', accessToken, cookieOptions);
       return {
         message: 'Login successful',
         data: { user, accessToken },
@@ -84,15 +89,16 @@ export class AuthService {
     }
   }
 
-  async logout(response: Response) {
+  async logout(request: Request, response: Response) {
     try {
+      if (!request.user) throw new UnauthorizedException('Unauthorized Access');
       const cookieOptions = {
         sameSite: 'none' as 'none',
         httpOnly: true,
         secure: true,
       };
 
-      response.clearCookie('accessToken', cookieOptions);
+      response.clearCookie('token', cookieOptions);
       return {
         message: 'Logout successful',
         success: true,
