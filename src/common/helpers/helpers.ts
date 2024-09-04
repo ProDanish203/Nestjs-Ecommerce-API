@@ -1,5 +1,6 @@
 import { Document, PaginateModel, PaginateOptions } from 'mongoose';
 import * as crypto from 'crypto';
+import { HttpException, HttpStatus } from '@nestjs/common';
 
 interface PaginationParams<T extends Document> {
   model: PaginateModel<T>;
@@ -43,3 +44,13 @@ export const getPaginatedData = async <T extends Document>({
 
 export const getRandomFileName = (bytes = 32) =>
   crypto.randomBytes(bytes).toString('hex');
+
+export const throwError = (
+  message: string | any,
+  statusCode?: number,
+): HttpException => {
+  return new HttpException(
+    message,
+    statusCode || HttpStatus.INTERNAL_SERVER_ERROR,
+  );
+};

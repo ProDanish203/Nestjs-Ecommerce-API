@@ -1,5 +1,5 @@
 import { Request } from 'express';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
 import { CreateCategoryDto, UpdateCategoryDto } from './dto/category.dto';
 import {
   Category,
@@ -8,7 +8,7 @@ import {
 import { PaginateModel } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { SearchParams } from 'src/common/types/types';
-import { getPaginatedData } from 'src/common/helpers/helpers';
+import { getPaginatedData, throwError } from 'src/common/helpers/helpers';
 import { User } from 'src/database/schema/User.schema';
 import { AwsService } from 'src/config/storagebucket';
 
@@ -30,16 +30,13 @@ export class CategoryService {
     image: any;
   }) {
     try {
-      if (!request.user) throw new UnauthorizedException();
+      if (!request.user)
+        throw throwError('Unauthorized Access', HttpStatus.UNAUTHORIZED);
       const { name, description, slug, parentCategory } = createCategoryDto;
 
       const image_url = await this.awsService.uploadFile(image);
-      if (!image_url) {
-        return {
-          message: 'Failed to upload image',
-          success: false,
-        };
-      }
+      if (!image_url)
+        throw throwError('Failed to upload image', HttpStatus.BAD_REQUEST);
 
       const category = await this.categoryModel.create({
         name,
@@ -50,12 +47,8 @@ export class CategoryService {
         image: image_url.filename,
       });
 
-      if (!category) {
-        return {
-          message: 'Failed to create category',
-          success: false,
-        };
-      }
+      if (!category)
+        throwError('Failed to create category', HttpStatus.BAD_REQUEST);
 
       return {
         message: 'Category created',
@@ -64,10 +57,7 @@ export class CategoryService {
       };
     } catch (error) {
       console.error('Failed to create category:', error);
-      return {
-        message: error.message || 'Category not created',
-        success: false,
-      };
+      throw throwError(error, HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -109,10 +99,7 @@ export class CategoryService {
       };
     } catch (error) {
       console.error('Failed to get all categories:', error);
-      return {
-        message: error.message || 'Categories not found',
-        success: false,
-      };
+      throw throwError(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -120,12 +107,8 @@ export class CategoryService {
     try {
       const category = await this.categoryModel.findById(id);
 
-      if (!category) {
-        return {
-          message: 'Category not found',
-          success: false,
-        };
-      }
+      if (!category)
+        throw throwError('Category not found', HttpStatus.NOT_FOUND);
 
       return {
         message: 'Category found',
@@ -134,10 +117,7 @@ export class CategoryService {
       };
     } catch (error) {
       console.error('Failed to get all categories:', error);
-      return {
-        message: error.message || 'Categories not found',
-        success: false,
-      };
+      throw throwError(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -153,27 +133,21 @@ export class CategoryService {
     updateCategoryDto: UpdateCategoryDto;
   }) {
     try {
-      if (!request.user) throw new UnauthorizedException();
+      if (!request.user)
+        throw throwError('Unauthorized Access', HttpStatus.UNAUTHORIZED);
 
       const category = await this.categoryModel.findById(id);
-      if (!category) {
-        return {
-          message: 'Category not found',
-          success: false,
-        };
-      }
+      if (!category)
+        throw throwError('Category not found', HttpStatus.NOT_FOUND);
 
       const { name, description, slug, parentCategory } = updateCategoryDto;
 
       let image_url: any;
       if (image) {
         const { filename } = await this.awsService.uploadFile(image);
-        if (!filename) {
-          return {
-            message: 'Failed to upload image',
-            success: false,
-          };
-        } else {
+        if (!filename)
+          throw throwError('Failed to upload image', HttpStatus.BAD_REQUEST);
+        else {
           image_url = filename;
 
           await this.awsService.removeFile(category.image);
@@ -192,12 +166,8 @@ export class CategoryService {
         { new: true },
       );
 
-      if (!updatedCategory) {
-        return {
-          message: 'Failed to update category',
-          success: false,
-        };
-      }
+      if (!updatedCategory)
+        throw throwError('Failed to update category', HttpStatus.BAD_REQUEST);
 
       return {
         message: 'Category updated',
@@ -206,22 +176,15 @@ export class CategoryService {
       };
     } catch (error) {
       console.error('Failed to get all categories:', error);
-      return {
-        message: error.message || 'Categories not found',
-        success: false,
-      };
+      throw throwError(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
   async remove(id: string) {
     try {
       const category = await this.categoryModel.findById(id);
-      if (!category) {
-        return {
-          message: 'Category not found',
-          success: false,
-        };
-      }
+      if (!category)
+        throw throwError('Category not found', HttpStatus.NOT_FOUND);
 
       await this.categoryModel.findByIdAndDelete(id);
       await this.categoryModel.updateMany(
@@ -236,10 +199,7 @@ export class CategoryService {
       };
     } catch (error) {
       console.error('Failed to get all categories:', error);
-      return {
-        message: error.message || 'Categories not found',
-        success: false,
-      };
+      throw throwError(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 }

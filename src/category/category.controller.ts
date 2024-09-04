@@ -11,6 +11,7 @@ import {
   UploadedFile,
   Req,
   UseGuards,
+  ValidationPipe,
 } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto, UpdateCategoryDto } from './dto/category.dto';
@@ -30,8 +31,8 @@ export class CategoryController {
   @UseGuards(AuthGuard)
   @Roles(ROLES.ADMIN)
   create(
-    @UploadedFile() image: any,
-    @Body() createCategoryDto: CreateCategoryDto,
+    @UploadedFile() image: Express.Multer.File,
+    @Body(ValidationPipe) createCategoryDto: CreateCategoryDto,
     @Req() request: Request,
   ) {
     return this.categoryService.create({ request, createCategoryDto, image });
@@ -56,9 +57,9 @@ export class CategoryController {
   @Roles(ROLES.ADMIN)
   update(
     @Param('id') id: string,
-    @Body() updateCategoryDto: UpdateCategoryDto,
+    @Body(ValidationPipe) updateCategoryDto: UpdateCategoryDto,
     @Req() request: Request,
-    @UploadedFile() image: any,
+    @UploadedFile() image: Express.Multer.File,
   ) {
     return this.categoryService.update({
       id,

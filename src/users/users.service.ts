@@ -1,10 +1,10 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { PaginateModel } from 'mongoose';
 import { User, UserDocument } from 'src/database/schema/User.schema';
 import { Request } from 'express';
 import { SearchParams } from 'src/common/types/types';
-import { getPaginatedData } from 'src/common/helpers/helpers';
+import { getPaginatedData, throwError } from 'src/common/helpers/helpers';
 
 @Injectable()
 export class UsersService {
@@ -39,10 +39,7 @@ export class UsersService {
       };
     } catch (error) {
       console.error('Failed to get all users:', error);
-      return {
-        message: error.message || 'Users not found',
-        success: false,
-      };
+      throw throwError(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -64,16 +61,14 @@ export class UsersService {
       };
     } catch (error) {
       console.error('Error verifying token:', error);
-      return {
-        message: error.message || 'User not found',
-        success: false,
-      };
+      throw throwError(error.message, HttpStatus.BAD_REQUEST);
     }
   }
 
   async currentUser(request: Request) {
     try {
-      if (!request.user) throw UnauthorizedException;
+      if (!request.user)
+        throw throwError('Unauthorized Access', HttpStatus.UNAUTHORIZED);
 
       return {
         message: 'User found',
@@ -82,7 +77,7 @@ export class UsersService {
       };
     } catch (error) {
       console.error('Error verifying token:', error);
-      throw new UnauthorizedException('Authentication Error');
+      throw throwError(error, HttpStatus.UNAUTHORIZED);
     }
   }
 }

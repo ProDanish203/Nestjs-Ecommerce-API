@@ -9,6 +9,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from 'src/database/schema/User.schema';
 import { Model } from 'mongoose';
 import { Response, Request } from 'express';
+import { throwError } from 'src/common/helpers/helpers';
 
 @Injectable()
 export class AuthService {
@@ -45,10 +46,7 @@ export class AuthService {
       };
     } catch (error) {
       console.log(error);
-      return {
-        message: error.message || 'Failed to create user',
-        success: false,
-      };
+      throw throwError(error.message, HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -64,7 +62,7 @@ export class AuthService {
       const user = await this.userModel.findOne({ email });
 
       if (!user || !(await user.comparePassword(password))) {
-        throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
+        throw throwError('Invalid credentials', HttpStatus.UNAUTHORIZED);
       }
 
       const accessToken = await user.generateAccessToken();
@@ -82,16 +80,14 @@ export class AuthService {
       };
     } catch (error: any) {
       console.log(error.message);
-      return {
-        message: error.message || 'Invalid Credentials',
-        success: false,
-      };
+      throw throwError(error.message, HttpStatus.UNAUTHORIZED);
     }
   }
 
   async logout(request: Request, response: Response) {
     try {
-      if (!request.user) throw new UnauthorizedException('Unauthorized Access');
+      if (!request.user)
+        throw throwError('Unauthorized Access', HttpStatus.UNAUTHORIZED);
       const cookieOptions = {
         sameSite: 'none' as 'none',
         httpOnly: true,
@@ -105,10 +101,7 @@ export class AuthService {
       };
     } catch (error) {
       console.log(error);
-      return {
-        message: error.message || 'Logout failed',
-        success: false,
-      };
+      throw throwError(error.message, HttpStatus.BAD_REQUEST);
     }
   }
 }
