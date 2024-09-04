@@ -1,7 +1,7 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { PaginateModel } from 'mongoose';
-import { User, UserDocument } from 'src/database/User.schema';
+import { User, UserDocument } from 'src/database/schema/User.schema';
 import { Request } from 'express';
 import { SearchParams } from 'src/common/types/types';
 import { getPaginatedData } from 'src/common/helpers/helpers';
@@ -40,7 +40,7 @@ export class UsersService {
     } catch (error) {
       console.error('Failed to get all users:', error);
       return {
-        message: 'Users not found',
+        message: error.message || 'Users not found',
         success: false,
       };
     }
@@ -65,7 +65,7 @@ export class UsersService {
     } catch (error) {
       console.error('Error verifying token:', error);
       return {
-        message: 'User not found',
+        message: error.message || 'User not found',
         success: false,
       };
     }

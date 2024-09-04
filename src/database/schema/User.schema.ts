@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
-import { Document, Model } from 'mongoose';
+import { Document } from 'mongoose';
 import * as mongoosePaginate from 'mongoose-paginate-v2';
 import { ROLES } from 'src/common/constants';
 

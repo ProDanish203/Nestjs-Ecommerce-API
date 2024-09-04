@@ -9,7 +9,7 @@ import * as jwt from 'jsonwebtoken';
 import { Request } from 'express';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { User, UserDocument } from 'src/database/User.schema';
+import { User, UserDocument } from 'src/database/schema/User.schema';
 import { Reflector } from '@nestjs/core';
 import { ROLES_KEY } from 'src/common/decorators/roles.decorator';
 import { Role } from '../common/types/types';

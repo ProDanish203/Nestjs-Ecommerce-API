@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { RegisterDto, LoginDto } from './dto/auth.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { User, UserDocument } from 'src/database/User.schema';
+import { User, UserDocument } from 'src/database/schema/User.schema';
 import { Model } from 'mongoose';
 import { Response, Request } from 'express';
 

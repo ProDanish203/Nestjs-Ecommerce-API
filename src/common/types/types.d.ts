@@ -7,6 +7,17 @@ export interface SearchParams {
   limit?: number;
   page?: number;
   filter?: string;
+  parentId?: string;
+}
+
+export interface MulterFile {
+  fieldname: string;
+  originalname: string;
+  encoding: string;
+  mimetype: string;
+  size: number;
+  buffer: Buffer;
+  filename: string;
 }
 
 export interface IUser {
@@ -19,4 +30,14 @@ export interface IUser {
   avatar?: string;
   isEmailVerified?: boolean;
   hasNotifications?: boolean;
+}
+
+export interface ICategory {
+  _id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  image: string;
+  createdBy: IUser;
+  parentCategory?: ICategory;
 }

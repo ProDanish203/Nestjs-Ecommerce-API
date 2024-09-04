@@ -1,5 +1,5 @@
 import { Document, PaginateModel, PaginateOptions } from 'mongoose';
-import { UserDocument } from 'src/database/User.schema';
+import * as crypto from 'crypto';
 
 interface PaginationParams<T extends Document> {
   model: PaginateModel<T>;
@@ -40,3 +40,6 @@ export const getPaginatedData = async <T extends Document>({
 
   return { data, pagination };
 };
+
+export const getRandomFileName = (bytes = 32) =>
+  crypto.randomBytes(bytes).toString('hex');
