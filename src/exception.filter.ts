@@ -34,35 +34,38 @@ export class HttpExceptionFilter implements ExceptionFilter {
       message: 'An unknown error occurred',
     };
 
+    // Extract the response object if it's an HttpException
+    let originalError = exception;
     if (exception instanceof HttpException) {
-      const status = exception.getStatus();
-      const message = exception.message;
-      defaultError.statusCode = status;
-      defaultError.message = message;
-    } else if (exception instanceof Error) {
+      originalError = exception.getResponse();
+      defaultError.statusCode = exception.getStatus();
       defaultError.message = exception.message;
-      if (
-        'statusCode' in exception &&
-        typeof (exception as CustomError).statusCode === 'number'
-      ) {
-        defaultError.statusCode = (exception as CustomError).statusCode;
+    }
+
+    // If the original error is a string or an object containing a MongoError
+    if (typeof originalError === 'string') {
+      defaultError.message = originalError;
+    } else if (originalError instanceof Error) {
+      defaultError.message = originalError.message;
+
+      // Check if it's a validation error from Mongoose
+      if (originalError instanceof MongooseError.ValidationError) {
+        defaultError.statusCode = HttpStatus.BAD_REQUEST;
+        defaultError.message = Object.values(originalError.errors)
+          .map((item) => item.message)
+          .join(', ');
       }
     }
 
-    if (exception instanceof MongooseError.ValidationError) {
-      defaultError.statusCode = HttpStatus.BAD_REQUEST;
-      defaultError.message = Object.values(exception.errors)
-        .map((item) => item.message)
-        .join(', ');
-    }
-
+    // Check if the exception is a MongoError or wrapped within an object
+    const exceptionObject = originalError as any;
     if (
-      typeof exception === 'object' &&
-      'code' in exception &&
-      (exception as MongoError).code === 11000
+      typeof exceptionObject === 'object' &&
+      'code' in exceptionObject &&
+      exceptionObject.code === 11000
     ) {
       defaultError.statusCode = HttpStatus.BAD_REQUEST;
-      const key = Object.keys((exception as MongoError).keyValue || {})[0];
+      const key = Object.keys(exceptionObject.keyValue || {})[0];
       defaultError.message = `${key.charAt(0).toUpperCase() + key.slice(1)} already exists.`;
     }
 

@@ -45,7 +45,6 @@ export class AuthService {
         success: true,
       };
     } catch (error) {
-      console.log(error);
       throw throwError(error.message, HttpStatus.BAD_REQUEST);
     }
   }
@@ -79,7 +78,6 @@ export class AuthService {
         success: true,
       };
     } catch (error: any) {
-      console.log(error.message);
       throw throwError(error.message, HttpStatus.UNAUTHORIZED);
     }
   }
@@ -100,7 +98,6 @@ export class AuthService {
         success: true,
       };
     } catch (error) {
-      console.log(error);
       throw throwError(error.message, HttpStatus.BAD_REQUEST);
     }
   }

@@ -38,7 +38,6 @@ export class UsersService {
         success: true,
       };
     } catch (error) {
-      console.error('Failed to get all users:', error);
       throw throwError(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
@@ -60,7 +59,6 @@ export class UsersService {
         success: true,
       };
     } catch (error) {
-      console.error('Error verifying token:', error);
       throw throwError(error.message, HttpStatus.BAD_REQUEST);
     }
   }
@@ -76,7 +74,6 @@ export class UsersService {
         success: true,
       };
     } catch (error) {
-      console.error('Error verifying token:', error);
       throw throwError(error, HttpStatus.UNAUTHORIZED);
     }
   }

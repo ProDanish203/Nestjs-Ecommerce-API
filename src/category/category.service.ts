@@ -56,7 +56,6 @@ export class CategoryService {
         success: true,
       };
     } catch (error) {
-      console.error('Failed to create category:', error);
       throw throwError(error, HttpStatus.BAD_REQUEST);
     }
   }
@@ -98,7 +97,6 @@ export class CategoryService {
         success: true,
       };
     } catch (error) {
-      console.error('Failed to get all categories:', error);
       throw throwError(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
@@ -116,7 +114,6 @@ export class CategoryService {
         success: true,
       };
     } catch (error) {
-      console.error('Failed to get all categories:', error);
       throw throwError(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
@@ -175,7 +172,6 @@ export class CategoryService {
         success: true,
       };
     } catch (error) {
-      console.error('Failed to get all categories:', error);
       throw throwError(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
@@ -198,7 +194,6 @@ export class CategoryService {
         success: true,
       };
     } catch (error) {
-      console.error('Failed to get all categories:', error);
       throw throwError(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
